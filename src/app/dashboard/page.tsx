@@ -11,7 +11,7 @@ import { ROLE_LABELS } from '@/types'
 import type { UserRole } from '@/types'
 import {
   Calendar, Users, Building2, Award, Megaphone, TrendingUp,
-  Clock, CheckCircle, AlertCircle, ArrowRight, Star,
+  Clock, CheckCircle, AlertCircle, ArrowRight, Star, ScanLine,
 } from 'lucide-react'
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 
@@ -184,6 +184,23 @@ function AdminDashboard({ stats, role }: { stats: any; role: UserRole }) {
 function VoluntarDashboard({ stats, userId }: { stats: any; userId: string }) {
   return (
     <>
+      {/* QR Scan CTA */}
+      <Link href="/scan" className="block group">
+        <div className="rounded-2xl p-4 sm:p-5 flex items-center gap-4 transition-all hover:shadow-lg hover:scale-[1.01]"
+             style={{ background: 'linear-gradient(135deg, #1a3a6e 0%, #2563eb 100%)' }}>
+          <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0">
+            <ScanLine className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white font-bold text-base leading-tight">Scanează QR Eveniment</p>
+            <p className="text-blue-200 text-sm mt-0.5">Înregistrează-ți prezența la un eveniment activ</p>
+          </div>
+          <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-white/20 transition-colors">
+            <ArrowRight className="w-4 h-4 text-white" />
+          </div>
+        </div>
+      </Link>
+
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <StatCard icon={<Star className="w-6 h-6 sm:w-8 sm:h-8" style={{color:'#c9a84c'}} />} label="Înregistrări" value={stats.myRecords} color="border-amber-400" href="/my-events" />
         <StatCard icon={<CheckCircle className="w-6 h-6 sm:w-8 sm:h-8" style={{color:'#2e7d32'}} />} label="Prezențe" value={stats.myCheckins} color="border-green-500" href="/my-events" />

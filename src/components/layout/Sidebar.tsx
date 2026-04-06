@@ -10,7 +10,7 @@ import { useSidebar } from './SidebarContext'
 import {
   LayoutDashboard, Calendar, CalendarDays, Users, Building2,
   Award, Settings, LogOut, Megaphone, ClipboardList,
-  UserCheck, FileText, ChevronRight, X,
+  UserCheck, FileText, ChevronRight, X, ScanLine,
 } from 'lucide-react'
 
 interface NavItem {
@@ -38,6 +38,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/events',
     icon: <Megaphone className="w-4 h-4" />,
     roles: ['superadmin','administrator','organizator','imagine','rectorat','sponsor','agrocampus','catering_extern','tehnic','partener','auditor'],
+  },
+  {
+    label: 'Scanează QR',
+    href: '/scan',
+    icon: <ScanLine className="w-4 h-4" />,
+    roles: ['voluntar', 'superadmin', 'administrator', 'imagine', 'organizator'],
   },
   {
     label: 'Evenimente Mele',
