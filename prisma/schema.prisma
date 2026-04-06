@@ -1,0 +1,244 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// NEXTAUTH MODELS
+// ─────────────────────────────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// USER
+// Roles: superadmin | administrator | organizator | imagine | rectorat
+//        | voluntar | sponsor | agrocampus | catering_extern | tehnic
+//        | partener | auditor
+// ─────────────────────────────────────────────────────────────────────
+model User {
+  id                  String    @id @default(cuid())
+  name                String?
+  email               String?   @unique
+  emailVerified       DateTime?
+  image               String?
+  password            String?
+  role                String    @default("auditor")
+  organizatorType     String?   // intern | extern
+  organizatorEntity   String?   // Faculty name / Liga / Fundatie / etc.
+  organizatorCompany  String?   // External company name
+  phone               String?
+  department          String?
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  accounts            Account[]
+  sessions            Session[]
+  createdEvents       Event[]          @relation("EventCreator")
+  validatedEvents     Event[]          @relation("EventValidator")
+  openedEvents        Event[]          @relation("EventOpener")
+  closedEvents        Event[]          @relation("EventCloser")
+  volunteerRecords    VolunteerRecord[]
+  observations        Observation[]
+  certificates        Certificate[]
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SPACE
+// Types: conferinta | tehnica | coffee_break | other
+// ─────────────────────────────────────────────────────────────────────
+model Space {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   @default("conferinta")
+  capacity    Int      @default(0)
+  floor       String?
+  building    String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  eventSpaces EventSpace[]
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// EVENT
+// Status: draft | submitted | validated | approved | open | closed | cancelled
+// ─────────────────────────────────────────────────────────────────────
+model Event {
+  id                    String    @id @default(cuid())
+  title                 String
+  description           String?
+  eventType             String    @default("conferinta")
+  startDate             DateTime
+  endDate               DateTime
+  setupStartDate        DateTime?
+  setupEndDate          DateTime?
+
+  organizatorId         String
+  organizatorName       String?
+  organizatorType       String    @default("intern")
+  organizatorEntity     String?
+
+  status                String    @default("draft")
+  estimatedParticipants Int       @default(0)
+  actualParticipants    Int?
+
+  technicalRequirements String?
+  technicalNotes        String?
+
+  cateringRequired      Boolean   @default(false)
+  cateringType          String?
+  cateringNotes         String?
+  coffeeBreakCount      Int?
+  lunchCount            Int?
+  dinnerCount           Int?
+
+  isPublic              Boolean   @default(true)
+  websiteUrl            String?
+  posterUrl             String?
+  otherRequirements     String?
+
+  promoQrCode           String?
+  attendanceQrCode      String?
+  attendanceQrToken     String?   @unique
+  attendanceQrExpiry    DateTime?
+
+  validatedById         String?
+  validatedAt           DateTime?
+  openedById            String?
+  openedAt              DateTime?
+  closedById            String?
+  closedAt              DateTime?
+  cancelledReason       String?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  creator               User      @relation("EventCreator", fields: [organizatorId], references: [id])
+  validator             User?     @relation("EventValidator", fields: [validatedById], references: [id])
+  opener                User?     @relation("EventOpener", fields: [openedById], references: [id])
+  closer                User?     @relation("EventCloser", fields: [closedById], references: [id])
+
+  eventSpaces           EventSpace[]
+  volunteerRecords      VolunteerRecord[]
+  observations          Observation[]
+  certificates          Certificate[]
+  equipment             EventEquipment[]
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// EVENT-SPACE
+// ─────────────────────────────────────────────────────────────────────
+model EventSpace {
+  id       String  @id @default(cuid())
+  eventId  String
+  spaceId  String
+  role     String  @default("main")
+  notes    String?
+  event    Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  space    Space   @relation(fields: [spaceId], references: [id])
+  @@unique([eventId, spaceId, role])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// VOLUNTEER RECORD
+// Status: preregistered | confirmed | checked_in | absent
+// ─────────────────────────────────────────────────────────────────────
+model VolunteerRecord {
+  id              String    @id @default(cuid())
+  eventId         String
+  userId          String
+  status          String    @default("preregistered")
+  role            String?
+  notes           String?
+  preregisteredAt DateTime  @default(now())
+  checkedInAt     DateTime?
+  checkedOutAt    DateTime?
+  event           Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([eventId, userId])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// OBSERVATION (append-only)
+// ─────────────────────────────────────────────────────────────────────
+model Observation {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  content   String
+  category  String   @default("general")
+  isUrgent  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// CERTIFICATE
+// ─────────────────────────────────────────────────────────────────────
+model Certificate {
+  id            String    @id @default(cuid())
+  eventId       String
+  userId        String
+  certificateNo String    @unique
+  type          String    @default("voluntar")
+  issuedAt      DateTime  @default(now())
+  downloadedAt  DateTime?
+  event         Event     @relation(fields: [eventId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+  @@unique([eventId, userId, type])
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// EVENT EQUIPMENT
+// ─────────────────────────────────────────────────────────────────────
+model EventEquipment {
+  id       String  @id @default(cuid())
+  eventId  String
+  name     String
+  quantity Int     @default(1)
+  status   String  @default("requested")
+  provider String  @default("intern")
+  notes    String?
+  event    Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
