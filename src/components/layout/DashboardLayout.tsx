@@ -1,6 +1,7 @@
 'use client'
 import { Sidebar } from './Sidebar'
 import { SidebarProvider, useSidebar } from './SidebarContext'
+import { PageTransition } from '@/components/ui/PageTransition'
 import type { UserRole } from '@/types'
 
 interface DashboardLayoutProps {
@@ -26,7 +27,7 @@ function LayoutInner({ children, user }: DashboardLayoutProps) {
       )}
       <Sidebar user={user} />
       <main className="flex-1 md:ml-64 overflow-y-auto min-w-0">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   )

@@ -13,6 +13,7 @@ import {
   Calendar, Users, Building2, Award, Megaphone, TrendingUp,
   Clock, CheckCircle, AlertCircle, ArrowRight, Star,
 } from 'lucide-react'
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter'
 
 async function getDashboardStats(userId: string, role: UserRole) {
   const now = new Date()
@@ -111,7 +112,9 @@ function StatCard({ icon, label, value, color, href }: { icon: React.ReactNode; 
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs sm:text-sm text-gray-500 font-medium leading-tight">{label}</p>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+            {typeof value === 'number' ? <AnimatedCounter value={value} /> : value}
+          </p>
         </div>
         <div className="mt-1 opacity-70 hidden sm:block">{icon}</div>
       </div>

@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { CheckCircle, XCircle, Loader2, LogIn, Award, Download, PartyPopper } from 'lucide-react'
+import { CheckCircle, XCircle, Loader2, LogIn, Award, Download, PartyPopper, Eye, X } from 'lucide-react'
 import { jsPDF } from 'jspdf'
 import { format } from 'date-fns'
 import { ro } from 'date-fns/locale'
@@ -22,6 +22,7 @@ export default function CheckInPage() {
     error?: string
   } | null>(null)
   const [loading, setLoading] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'authenticated' && token && !result) {
@@ -143,6 +144,49 @@ export default function CheckInPage() {
     doc.save(`adeverinta-${cert.certificateNo}.pdf`)
   }
 
+  function previewCertificate(cert: any, userName: string) {
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' })
+    const pageW = doc.internal.pageSize.getWidth()
+    const pageH = doc.internal.pageSize.getHeight()
+    doc.setFillColor(248, 250, 252); doc.rect(0, 0, pageW, pageH, 'F')
+    doc.setDrawColor(26, 58, 110); doc.setLineWidth(3); doc.rect(10, 10, pageW - 20, pageH - 20)
+    doc.setLineWidth(1); doc.setDrawColor(201, 168, 76); doc.rect(13, 13, pageW - 26, pageH - 26)
+    doc.setFillColor(26, 58, 110); doc.rect(10, 10, pageW - 20, 35, 'F')
+    doc.setTextColor(255, 255, 255); doc.setFontSize(11); doc.setFont('helvetica', 'bold')
+    doc.text('UNIVERSITATEA DE ȘTIINȚELE VIEȚII "REGELE MIHAI I" DIN TIMIȘOARA', pageW / 2, 24, { align: 'center' })
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal')
+    doc.text('Departamentul Imagine · Management Evenimente', pageW / 2, 33, { align: 'center' })
+    doc.setTextColor(26, 58, 110); doc.setFontSize(28); doc.setFont('helvetica', 'bold')
+    doc.text('ADEVERINȚĂ DE PARTICIPARE', pageW / 2, 62, { align: 'center' })
+    doc.setDrawColor(201, 168, 76); doc.setLineWidth(1.5); doc.line(30, 67, pageW - 30, 67)
+    doc.setTextColor(30, 30, 30); doc.setFontSize(12); doc.setFont('helvetica', 'normal')
+    doc.text('Prin prezenta se atestă că', pageW / 2, 82, { align: 'center' })
+    doc.setFontSize(22); doc.setFont('helvetica', 'bold'); doc.setTextColor(26, 58, 110)
+    doc.text(userName || cert.user?.name || 'Voluntar', pageW / 2, 97, { align: 'center' })
+    doc.setFontSize(12); doc.setFont('helvetica', 'normal'); doc.setTextColor(30, 30, 30)
+    doc.text('a participat în calitate de VOLUNTAR la evenimentul', pageW / 2, 110, { align: 'center' })
+    doc.setFontSize(16); doc.setFont('helvetica', 'bold'); doc.setTextColor(26, 58, 110)
+    doc.text(cert.event?.title || result?.event?.title || 'Eveniment USVT', pageW / 2, 124, { align: 'center', maxWidth: pageW - 60 })
+    doc.setFontSize(11); doc.setFont('helvetica', 'normal'); doc.setTextColor(80, 80, 80)
+    const ev = cert.event || result?.event
+    if (ev?.startDate) {
+      const start = format(new Date(ev.startDate), 'd MMMM yyyy', { locale: ro })
+      const end = format(new Date(ev.endDate), 'd MMMM yyyy', { locale: ro })
+      doc.text(`Perioada: ${start} – ${end}`, pageW / 2, 138, { align: 'center' })
+    }
+    if (ev?.organizatorEntity) doc.text(`Organizator: ${ev.organizatorEntity}`, pageW / 2, 146, { align: 'center' })
+    doc.setDrawColor(201, 168, 76); doc.setLineWidth(1); doc.line(30, 155, pageW - 30, 155)
+    doc.setFontSize(9); doc.setTextColor(100, 100, 100)
+    const issued = format(new Date(cert.issuedAt || new Date()), 'dd.MM.yyyy', { locale: ro })
+    doc.text(`Nr. Adeverință: ${cert.certificateNo}`, 20, 168)
+    doc.text(`Data emiterii: ${issued}`, pageW / 2, 168, { align: 'center' })
+    doc.text('Semnătură Responsabil Imagine', pageW - 20, 168, { align: 'right' })
+    doc.setDrawColor(150, 150, 150); doc.line(pageW - 80, 175, pageW - 20, 175)
+    const blob = doc.output('blob')
+    const url = URL.createObjectURL(blob)
+    setPreviewUrl(url)
+  }
+
   if (status === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center usvt-gradient-hero">
@@ -152,7 +196,32 @@ export default function CheckInPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center usvt-gradient-hero p-4">
+    <div className="min-h-screen flex items-center justify-center usvt-gradient-hero p-4 relative">
+      {/* PDF Preview Modal */}
+      {previewUrl && (
+        <div className="fixed inset-0 bg-black/75 z-50 flex flex-col p-3 sm:p-6 animate-fade-in">
+          <div className="bg-white rounded-2xl overflow-hidden flex flex-col flex-1 min-h-0 shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4" style={{ color: '#c9a84c' }} />
+                <span className="font-medium text-sm text-gray-900">Adeverință de Participare</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a href={previewUrl} download="adeverinta.pdf"
+                   className="btn btn-primary btn-sm"
+                   onClick={() => {}}>
+                  <Download className="w-3.5 h-3.5" /> Descarcă
+                </a>
+                <button onClick={() => { URL.revokeObjectURL(previewUrl); setPreviewUrl(null) }}
+                        className="btn btn-secondary btn-sm">
+                  <X className="w-3.5 h-3.5" /> Închide
+                </button>
+              </div>
+            </div>
+            <iframe src={previewUrl} className="flex-1 w-full" title="Previzualizare Adeverință" />
+          </div>
+        </div>
+      )}
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center animate-fade-in">
         {/* Logo */}
         <div className="flex justify-center mb-5">
@@ -234,14 +303,22 @@ export default function CheckInPage() {
                   </span>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">Nr. {result.certificate.certificateNo}</p>
-                <button
-                  onClick={() => downloadCertificate(result.certificate, session?.user?.name || '')}
-                  className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-white text-sm font-semibold transition-opacity hover:opacity-90"
-                  style={{ background: '#1a3a6e' }}
-                >
-                  <Download className="w-4 h-4" />
-                  Descarcă Adeverința PDF
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => previewCertificate(result.certificate, session?.user?.name || '')}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold border-2 transition-colors hover:bg-blue-50"
+                    style={{ borderColor: '#1a3a6e', color: '#1a3a6e' }}
+                  >
+                    <Eye className="w-4 h-4" /> Preview
+                  </button>
+                  <button
+                    onClick={() => downloadCertificate(result.certificate, session?.user?.name || '')}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-white text-sm font-semibold transition-opacity hover:opacity-90"
+                    style={{ background: '#1a3a6e' }}
+                  >
+                    <Download className="w-4 h-4" /> PDF
+                  </button>
+                </div>
               </div>
             )}
 

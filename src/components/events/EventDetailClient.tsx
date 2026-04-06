@@ -203,23 +203,25 @@ export function EventDetailClient({ event, role, userId, fullSheet }: EventDetai
         </div>
       </div>
 
-      {/* Tab content */}
-      {activeTab === 'info' && <InfoTab event={event} fullSheet={fullSheet} />}
-      {activeTab === 'spaces' && <SpacesTab event={event} />}
-      {activeTab === 'equipment' && <EquipmentTab event={event} />}
-      {activeTab === 'catering' && fullSheet && <CateringTab event={event} />}
-      {activeTab === 'volunteers' && fullSheet && (
-        <VolunteerPanel volunteers={event.volunteerRecords || []} eventId={event.id} eventStatus={event.status} role={role} />
-      )}
-      {activeTab === 'observations' && (
-        <ObservationsPanel
-          observations={event.observations || []}
-          eventId={event.id}
-          canAdd={canAddObservation(role)}
-          userId={userId}
-        />
-      )}
-      {activeTab === 'qr' && <QRSection event={event} role={role} />}
+      {/* Tab content — key triggers re-animation on tab switch */}
+      <div key={activeTab} className="animate-fade-in">
+        {activeTab === 'info' && <InfoTab event={event} fullSheet={fullSheet} />}
+        {activeTab === 'spaces' && <SpacesTab event={event} />}
+        {activeTab === 'equipment' && <EquipmentTab event={event} />}
+        {activeTab === 'catering' && fullSheet && <CateringTab event={event} />}
+        {activeTab === 'volunteers' && fullSheet && (
+          <VolunteerPanel volunteers={event.volunteerRecords || []} eventId={event.id} eventStatus={event.status} role={role} />
+        )}
+        {activeTab === 'observations' && (
+          <ObservationsPanel
+            observations={event.observations || []}
+            eventId={event.id}
+            canAdd={canAddObservation(role)}
+            userId={userId}
+          />
+        )}
+        {activeTab === 'qr' && <QRSection event={event} role={role} />}
+      </div>
 
       {/* Cancel modal */}
       {showCancelModal && (
