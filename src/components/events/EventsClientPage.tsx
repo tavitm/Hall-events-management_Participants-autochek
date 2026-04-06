@@ -45,9 +45,10 @@ export function EventsClientPage({ events, role, userId }: EventsClientPageProps
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="card p-4">
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="relative flex-1 min-w-48">
+      <div className="card p-3 sm:p-4">
+        <div className="flex flex-col gap-3">
+          {/* Search — full width */}
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               className="form-input pl-9"
@@ -56,26 +57,29 @@ export function EventsClientPage({ events, role, userId }: EventsClientPageProps
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <select className="form-input w-auto" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-            {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-          <select className="form-input w-auto" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
-            <option value="">Toate tipurile</option>
-            {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
-          <div className="flex border border-gray-200 rounded-lg overflow-hidden">
-            <button onClick={() => setView('grid')}
-              className={`px-3 py-2 text-xs ${view==='grid' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}
-              style={view==='grid' ? {color:'#1a3a6e',background:'#f0f4fb'} : {}}>
-              Grilă
-            </button>
-            <button onClick={() => setView('list')}
-              className={`px-3 py-2 text-xs ${view==='list' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}
-              style={view==='list' ? {color:'#1a3a6e',background:'#f0f4fb'} : {}}>
-              Listă
-            </button>
+          {/* Filters row */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <select className="form-input flex-1 min-w-0 sm:flex-none sm:w-auto" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+              {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <select className="form-input flex-1 min-w-0 sm:flex-none sm:w-auto" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+              <option value="">Toate tipurile</option>
+              {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+            <div className="flex border border-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+              <button onClick={() => setView('grid')}
+                className={`px-3 py-2 text-xs ${view==='grid' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}
+                style={view==='grid' ? {color:'#1a3a6e',background:'#f0f4fb'} : {}}>
+                Grilă
+              </button>
+              <button onClick={() => setView('list')}
+                className={`px-3 py-2 text-xs ${view==='list' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}
+                style={view==='list' ? {color:'#1a3a6e',background:'#f0f4fb'} : {}}>
+                Listă
+              </button>
+            </div>
+            <span className="text-xs text-gray-400 ml-auto">{filtered.length} rezultate</span>
           </div>
-          <span className="text-xs text-gray-400">{filtered.length} rezultate</span>
         </div>
       </div>
 
@@ -85,11 +89,12 @@ export function EventsClientPage({ events, role, userId }: EventsClientPageProps
           <p className="text-gray-400">Niciun eveniment găsit</p>
         </div>
       ) : view === 'grid' ? (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map(ev => <EventCard key={ev.id} event={ev} role={role} userId={userId} />)}
         </div>
       ) : (
         <div className="card overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
               <tr>
@@ -126,6 +131,7 @@ export function EventsClientPage({ events, role, userId }: EventsClientPageProps
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

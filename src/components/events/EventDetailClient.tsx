@@ -102,8 +102,8 @@ export function EventDetailClient({ event, role, userId, fullSheet }: EventDetai
       )}
 
       {/* Action bar */}
-      <div className="card p-4">
-        <div className="flex flex-wrap items-center gap-3">
+      <div className="card p-3 sm:p-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <StatusBadge status={event.status} />
           <div className="flex-1" />
 
@@ -343,6 +343,7 @@ function EquipmentTab({ event }: { event: any }) {
   }
   return (
     <div className="card overflow-hidden">
+      <div className="overflow-x-auto">
       <table className="data-table">
         <thead>
           <tr>
@@ -361,6 +362,7 @@ function EquipmentTab({ event }: { event: any }) {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

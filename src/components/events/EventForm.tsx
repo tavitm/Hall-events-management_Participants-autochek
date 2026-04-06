@@ -129,7 +129,7 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
               value={form.title} onChange={e => updateForm('title', e.target.value)} required />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-group">
               <label className="form-label">Tip Eveniment</label>
               <select className="form-input" value={form.eventType} onChange={e => updateForm('eventType', e.target.value)}>
@@ -167,7 +167,7 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
               value={form.description} onChange={e => updateForm('description', e.target.value)} />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="form-group">
               <label className="form-label">Participanți Estimați</label>
               <input className="form-input" type="number" min={0} placeholder="0"
@@ -194,7 +194,7 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
         <div className="space-y-5">
           <div className="card p-6 space-y-4">
             <h2 className="font-semibold text-gray-900">Program Eveniment</h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="form-group">
                 <label className="form-label">Data & Ora Început *</label>
                 <input className="form-input" type="datetime-local"
@@ -228,30 +228,32 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
             {selectedSpaces.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-4">Niciun spațiu selectat</p>
             ) : selectedSpaces.map((sp, i) => (
-              <div key={i} className="grid grid-cols-12 gap-2 items-end p-3 bg-gray-50 rounded-lg">
-                <div className="col-span-5">
+              <div key={i} className="p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:gap-2 sm:items-end">
+                <div className="sm:col-span-5">
                   <label className="form-label text-xs">Sală</label>
                   <select className="form-input text-sm" value={sp.spaceId}
                     onChange={e => setSelectedSpaces(s => s.map((x,j) => j===i ? {...x, spaceId: e.target.value} : x))}>
                     {spaces.map(s => <option key={s.id} value={s.id}>{s.name} ({s.capacity} loc.)</option>)}
                   </select>
                 </div>
-                <div className="col-span-3">
-                  <label className="form-label text-xs">Rol</label>
-                  <select className="form-input text-sm" value={sp.role}
-                    onChange={e => setSelectedSpaces(s => s.map((x,j) => j===i ? {...x, role: e.target.value} : x))}>
-                    <option value="main">Principal</option>
-                    <option value="technical">Tehnic</option>
-                    <option value="coffee_break">Coffee Break</option>
-                    <option value="registration">Înregistrare</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-2 sm:contents">
+                  <div className="sm:col-span-3">
+                    <label className="form-label text-xs">Rol</label>
+                    <select className="form-input text-sm" value={sp.role}
+                      onChange={e => setSelectedSpaces(s => s.map((x,j) => j===i ? {...x, role: e.target.value} : x))}>
+                      <option value="main">Principal</option>
+                      <option value="technical">Tehnic</option>
+                      <option value="coffee_break">Coffee Break</option>
+                      <option value="registration">Înregistrare</option>
+                    </select>
+                  </div>
+                  <div className="sm:col-span-3">
+                    <label className="form-label text-xs">Note</label>
+                    <input className="form-input text-sm" placeholder="..."
+                      value={sp.notes} onChange={e => setSelectedSpaces(s => s.map((x,j) => j===i ? {...x, notes: e.target.value} : x))} />
+                  </div>
                 </div>
-                <div className="col-span-3">
-                  <label className="form-label text-xs">Note</label>
-                  <input className="form-input text-sm" placeholder="..."
-                    value={sp.notes} onChange={e => setSelectedSpaces(s => s.map((x,j) => j===i ? {...x, notes: e.target.value} : x))} />
-                </div>
-                <div className="col-span-1 flex justify-center pb-1">
+                <div className="flex justify-end sm:col-span-1 sm:justify-center sm:pb-1">
                   <button type="button" className="text-red-400 hover:text-red-600"
                     onClick={() => setSelectedSpaces(s => s.filter((_,j) => j !== i))}>
                     <Trash2 className="w-4 h-4" />
@@ -279,33 +281,35 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
                 value={form.technicalNotes} onChange={e => updateForm('technicalNotes', e.target.value)} />
             </div>
             {equipment.map((eq, i) => (
-              <div key={i} className="grid grid-cols-12 gap-2 items-end p-3 bg-gray-50 rounded-lg">
-                <div className="col-span-5">
+              <div key={i} className="p-3 bg-gray-50 rounded-lg space-y-2 sm:space-y-0 sm:grid sm:grid-cols-12 sm:gap-2 sm:items-end">
+                <div className="sm:col-span-5">
                   <label className="form-label text-xs">Echipament</label>
                   <select className="form-input text-sm" value={eq.name}
                     onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, name: e.target.value} : x))}>
                     {EQUIPMENT_ITEMS.map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
-                <div className="col-span-2">
-                  <label className="form-label text-xs">Cantitate</label>
-                  <input className="form-input text-sm" type="number" min={1}
-                    value={eq.quantity} onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, quantity: Number(e.target.value)} : x))} />
+                <div className="grid grid-cols-2 gap-2 sm:contents">
+                  <div className="sm:col-span-2">
+                    <label className="form-label text-xs">Cantitate</label>
+                    <input className="form-input text-sm" type="number" min={1}
+                      value={eq.quantity} onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, quantity: Number(e.target.value)} : x))} />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="form-label text-xs">Furnizor</label>
+                    <select className="form-input text-sm" value={eq.provider}
+                      onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, provider: e.target.value} : x))}>
+                      <option value="intern">Intern</option>
+                      <option value="tehnic_extern">Extern</option>
+                    </select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="form-label text-xs">Note</label>
+                    <input className="form-input text-sm" placeholder="..."
+                      value={eq.notes} onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, notes: e.target.value} : x))} />
+                  </div>
                 </div>
-                <div className="col-span-2">
-                  <label className="form-label text-xs">Furnizor</label>
-                  <select className="form-input text-sm" value={eq.provider}
-                    onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, provider: e.target.value} : x))}>
-                    <option value="intern">Intern</option>
-                    <option value="tehnic_extern">Extern</option>
-                  </select>
-                </div>
-                <div className="col-span-2">
-                  <label className="form-label text-xs">Note</label>
-                  <input className="form-input text-sm" placeholder="..."
-                    value={eq.notes} onChange={e => setEquipment(s => s.map((x,j) => j===i ? {...x, notes: e.target.value} : x))} />
-                </div>
-                <div className="col-span-1 flex justify-center pb-1">
+                <div className="flex justify-end sm:col-span-1 sm:justify-center sm:pb-1">
                   <button type="button" className="text-red-400 hover:text-red-600"
                     onClick={() => setEquipment(s => s.filter((_,j) => j !== i))}>
                     <Trash2 className="w-4 h-4" />
@@ -334,7 +338,7 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
                     <option value="both">Ambii furnizori</option>
                   </select>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="form-group">
                     <label className="form-label">Coffee Break (pers.)</label>
                     <input className="form-input" type="number" min={0} value={form.coffeeBreakCount} onChange={e => updateForm('coffeeBreakCount', e.target.value)} />
@@ -373,7 +377,7 @@ export function EventForm({ spaces, user, initialData }: EventFormProps) {
           <h2 className="font-semibold text-gray-900">Revizuire & Salvare</h2>
           <div className="bg-blue-50 rounded-xl p-4 space-y-2 text-sm" style={{background:'#f0f4fb'}}>
             <p className="font-medium" style={{color:'#1a3a6e'}}>Rezumat Eveniment</p>
-            <div className="grid grid-cols-2 gap-2 text-gray-700">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-700">
               <p><strong>Titlu:</strong> {form.title || '–'}</p>
               <p><strong>Tip:</strong> {form.eventType}</p>
               <p><strong>Organizator:</strong> {form.organizatorEntity || form.organizatorCompany || '–'}</p>

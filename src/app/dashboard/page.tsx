@@ -76,18 +76,18 @@ export default async function DashboardPage() {
         title="Dashboard"
         subtitle={`${ROLE_LABELS[user.role]} · ${new Date().toLocaleDateString('ro-RO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
       />
-      <div className="p-6 space-y-6">
+      <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
         {/* Welcome banner */}
         <div className="rounded-2xl overflow-hidden shadow-md">
-          <div className="usvt-gradient-hero p-6 flex items-center gap-6">
-            <div className="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/25 flex-shrink-0">
+          <div className="usvt-gradient-hero p-4 sm:p-6 flex items-center gap-4 sm:gap-6">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-white/15 flex items-center justify-center border-2 border-white/25 flex-shrink-0">
               <Image src="/logos/usvt-main.png" alt="USVT" width={52} height={52} className="rounded-full object-contain" />
             </div>
-            <div className="text-white">
-              <h2 className="text-xl font-bold">
+            <div className="text-white min-w-0">
+              <h2 className="text-base sm:text-xl font-bold truncate">
                 Bun venit, {session.user.name?.split(' ')[0] || 'Utilizator'}! 👋
               </h2>
-              <p className="text-blue-200 text-sm mt-0.5">
+              <p className="text-blue-200 text-xs sm:text-sm mt-0.5 truncate">
                 {ROLE_LABELS[user.role]}
                 {user.organizatorEntity && ` · ${user.organizatorEntity}`}
               </p>
@@ -107,13 +107,13 @@ export default async function DashboardPage() {
 
 function StatCard({ icon, label, value, color, href }: { icon: React.ReactNode; label: string; value: number | string; color: string; href?: string }) {
   const content = (
-    <div className={`card p-5 border-l-4 ${color} hover:shadow-md transition-shadow`}>
+    <div className={`card p-3 sm:p-5 border-l-4 ${color} hover:shadow-md transition-shadow`}>
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-gray-500 font-medium">{label}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+          <p className="text-xs sm:text-sm text-gray-500 font-medium leading-tight">{label}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{value}</p>
         </div>
-        <div className="mt-1 opacity-70">{icon}</div>
+        <div className="mt-1 opacity-70 hidden sm:block">{icon}</div>
       </div>
     </div>
   )
@@ -152,8 +152,8 @@ function AdminDashboard({ stats, role }: { stats: any; role: UserRole }) {
           {stats.recentEvents?.length === 0 ? (
             <p className="p-6 text-center text-gray-400 text-sm">Niciun eveniment înregistrat</p>
           ) : stats.recentEvents?.map((ev: any) => (
-            <Link key={ev.id} href={`/events/${ev.id}`} className="flex items-center gap-4 p-4 hover:bg-blue-50/50 transition-colors">
-              <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center flex-shrink-0 text-white text-xs font-bold"
+            <Link key={ev.id} href={`/events/${ev.id}`} className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-blue-50/50 transition-colors">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex flex-col items-center justify-center flex-shrink-0 text-white text-xs font-bold"
                    style={{background:'#1a3a6e'}}>
                 <span>{new Date(ev.startDate).getDate()}</span>
                 <span className="text-[10px] uppercase">{new Date(ev.startDate).toLocaleString('ro-RO',{month:'short'})}</span>
@@ -164,8 +164,8 @@ function AdminDashboard({ stats, role }: { stats: any; role: UserRole }) {
                   {ev.creator?.organizatorEntity || ev.creator?.name} · {formatTime(ev.startDate)}–{formatTime(ev.endDate)}
                 </p>
               </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
-                <span className="text-xs text-gray-400 flex items-center gap-1">
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className="text-xs text-gray-400 hidden sm:flex items-center gap-1">
                   <Users className="w-3 h-3" /> {ev._count?.volunteerRecords}
                 </span>
                 <StatusBadge status={ev.status} />
@@ -181,10 +181,10 @@ function AdminDashboard({ stats, role }: { stats: any; role: UserRole }) {
 function VoluntarDashboard({ stats, userId }: { stats: any; userId: string }) {
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
-        <StatCard icon={<Star className="w-8 h-8" style={{color:'#c9a84c'}} />} label="Înregistrări" value={stats.myRecords} color="border-amber-400" href="/my-events" />
-        <StatCard icon={<CheckCircle className="w-8 h-8" style={{color:'#2e7d32'}} />} label="Prezențe" value={stats.myCheckins} color="border-green-500" href="/my-events" />
-        <StatCard icon={<Award className="w-8 h-8" style={{color:'#1a3a6e'}} />} label="Adeverințe" value={stats.myCerts} color="border-blue-500" href="/my-certificates" />
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+        <StatCard icon={<Star className="w-6 h-6 sm:w-8 sm:h-8" style={{color:'#c9a84c'}} />} label="Înregistrări" value={stats.myRecords} color="border-amber-400" href="/my-events" />
+        <StatCard icon={<CheckCircle className="w-6 h-6 sm:w-8 sm:h-8" style={{color:'#2e7d32'}} />} label="Prezențe" value={stats.myCheckins} color="border-green-500" href="/my-events" />
+        <StatCard icon={<Award className="w-6 h-6 sm:w-8 sm:h-8" style={{color:'#1a3a6e'}} />} label="Adeverințe" value={stats.myCerts} color="border-blue-500" href="/my-certificates" />
       </div>
 
       <div className="card">

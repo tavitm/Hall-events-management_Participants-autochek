@@ -358,6 +358,42 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   MOBILE RESPONSIVE OVERRIDES
+───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Tighter padding on cards in mobile */
+  .card {
+    border-radius: 10px;
+  }
+
+  /* Smaller data table on mobile */
+  .data-table th,
+  .data-table td {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  /* Make status badges slightly smaller */
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 2px 7px;
+  }
+
+  /* Form inputs — slightly smaller padding on mobile */
+  .form-input {
+    padding: 7px 10px;
+    font-size: 0.875rem;
+  }
+
+  /* QR container adapts to screen */
+  .qr-container {
+    padding: 14px;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
    SCROLLBAR
 ───────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }

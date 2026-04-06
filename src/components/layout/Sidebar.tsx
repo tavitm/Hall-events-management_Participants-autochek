@@ -6,10 +6,11 @@ import { signOut } from 'next-auth/react'
 import { cn, getInitials } from '@/lib/utils'
 import { ROLE_LABELS } from '@/types'
 import type { UserRole } from '@/types'
+import { useSidebar } from './SidebarContext'
 import {
   LayoutDashboard, Calendar, CalendarDays, Users, Building2,
   Award, Settings, LogOut, Megaphone, ClipboardList,
-  UserCheck, FileText, ChevronRight,
+  UserCheck, FileText, ChevronRight, X,
 } from 'lucide-react'
 
 interface NavItem {
@@ -93,10 +94,18 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname()
+  const { open, setOpen } = useSidebar()
   const visibleItems = NAV_ITEMS.filter(item => item.roles.includes(user.role))
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 usvt-gradient flex flex-col z-40 shadow-xl">
+    <aside className={cn(
+      'fixed left-0 top-0 h-full w-64 usvt-gradient flex flex-col z-40 shadow-xl',
+      'transition-transform duration-300 ease-in-out',
+      // Mobile: hidden by default, shown when open
+      open ? 'translate-x-0' : '-translate-x-full',
+      // Desktop: always visible
+      'md:translate-x-0',
+    )}>
       {/* Header */}
       <div className="p-5 border-b border-white/10">
         <div className="flex items-center gap-3">
@@ -109,10 +118,17 @@ export function Sidebar({ user }: SidebarProps) {
               className="rounded-full border-2 border-white/30 object-contain bg-white p-0.5"
             />
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex-1">
             <p className="text-white font-bold text-sm leading-tight">USVT Events</p>
             <p className="text-blue-200 text-xs leading-tight mt-0.5">Management Evenimente</p>
           </div>
+          {/* Close button — mobile only */}
+          <button
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 md:hidden flex-shrink-0"
+            onClick={() => setOpen(false)}
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -124,6 +140,7 @@ export function Sidebar({ user }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setOpen(false)}
               className={cn('sidebar-nav-item', isActive && 'active')}
             >
               {item.icon}
