@@ -83,11 +83,24 @@ export function EventDetailClient({ event, role, userId, fullSheet }: EventDetai
       { id: 'volunteers', label: 'Voluntari', count: event.volunteerRecords?.length },
     ] : []),
     { id: 'observations', label: 'Observații', count: event.observations?.length },
-    ...(fullSheet && (event.promoQrCode || event.attendanceQrCode) ? [{ id: 'qr', label: 'QR Codes' }] : []),
+    // QR tab only for admin roles, in the tab bar
+    ...(fullSheet && ['superadmin','administrator','imagine','organizator'].includes(role) && (event.promoQrCode || event.attendanceQrCode) ? [{ id: 'qr', label: 'QR Codes' }] : []),
   ]
 
   return (
     <div className="space-y-5 animate-fade-in">
+
+      {/* ── QR Banner pentru toți — vizibil când evenimentul e activ ── */}
+      {event.status === 'open' && event.attendanceQrCode && (
+        <div className="rounded-2xl border-2 border-green-400 bg-green-50 p-5 text-center">
+          <p className="text-sm font-semibold text-green-800 mb-4 flex items-center justify-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse inline-block" />
+            Eveniment activ — Voluntarii scanează codul pentru a-și înregistra prezența
+          </p>
+          <QRSection event={event} role={role} inline={false} />
+        </div>
+      )}
+
       {/* Action bar */}
       <div className="card p-4">
         <div className="flex flex-wrap items-center gap-3">
